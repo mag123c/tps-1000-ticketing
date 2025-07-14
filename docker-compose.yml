@@ -1,0 +1,30 @@
+services:
+  ticketing_mysql:
+    image: mysql:8.0
+    container_name: ticketing_mysql
+    environment:
+      MYSQL_DATABASE: ticketing
+      MYSQL_USER: test_user
+      MYSQL_PASSWORD: test_pass
+      MYSQL_ROOT_PASSWORD: root_pass
+    ports:
+      - '3337:3306'
+    volumes:
+      - ticketing_data:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
+    command: >
+      --innodb-buffer-pool-size=32M
+      --max-connections=50
+      --innodb-redo-log-capacity=32M
+      --innodb-log-buffer-size=1M
+      --sort-buffer-size=64K
+      --read-buffer-size=256K
+    mem_limit: 200m
+    cpus: 0.5
+
+volumes:
+  ticketing_data:
+
+networks:
+  dev_network:
+    driver: bridge
