@@ -47,7 +47,8 @@ model PaymentHistoryModel {
   paymentNo Int          @map("payment_no")
   payment   PaymentModel @relation(fields: [paymentNo], references: [no])
 
-  type      String // pending, progress, complete, reject, error
+  type      String   // pending, processing, completed, reject, error
+  reason    String?  // 실패/에러 사유: insufficient_stock, max_per_user_exceeded, payment_failed 등
   createdAt DateTime @default(now())
 
   @@index([paymentNo, createdAt, type]) // 리스트 조회 (+ 특정 타입 필터링)
