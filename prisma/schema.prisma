@@ -22,7 +22,6 @@ model UserModel {
 
 model PaymentModel {
   no            Int      @id @default(autoincrement())
-  quantity      Int      @default(1) // 구매 수량
   paymentMethod String   @map("payment_method") // deposit, card
   status        String   @default("pending") // pending, processing, completed, failed
   createdAt     DateTime @default(now()) @map("created_at")
@@ -35,7 +34,7 @@ model PaymentModel {
   ticket              TicketModel           @relation(fields: [ticketNo], references: [no])
   PaymentHistoryModel PaymentHistoryModel[]
 
-  @@index([userNo, ticketNo]) // 사용자별 결제 + 특정 티켓 조회 커버
+  @@unique([userNo, ticketNo]) // 한 사용자당 같은 티켓 한 장만 구매 가능
   @@index([ticketNo]) // 티켓별 판매 현황 
   @@index([status, createdAt]) // 관리자: 상태별 + 시간순 정렬
   @@map("payment")
@@ -55,19 +54,16 @@ model PaymentHistoryModel {
 }
 
 model TicketModel {
-  no         Int      @id @default(autoincrement())
-  name       String   @unique
-  price      Int
-  stock      Int // 재고
-  maxStock   Int      @map("max_stock") // 전체 재고
-  maxPerUser Int      @default(1) @map("max_per_user") // 사용자당 최대 구매 가능 수량
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt() @map("updated_at")
+  no        Int      @id @default(autoincrement())
+  name      String   @unique
+  price     Int
+  stock     Int // 현재 재고
+  maxStock  Int      @map("max_stock") // 전체 재고
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt() @map("updated_at")
 
   Payment PaymentModel[]
 
   @@index([stock]) // 재고 있는 티켓 조회 
-  @@index([price]) // 가격대별 정렬
-  @@index([createdAt]) // 최신순 정렬
   @@map("ticket")
 }
